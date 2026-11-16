@@ -1,71 +1,29 @@
-# ShipNow — Pre-entrega 1
+## Módulo 4: Logging y Monitoreo Básico
 
-API de logística refactorizada a arquitectura por capas (Controller → Service → Repository)
-con configuración de entorno validada al arranque.
+Se implementó **Winston** como logger centralizado para reemplazar los `console.log()` sueltos. Esto permite clasificar los eventos por importancia y guardar los errores en archivos para su posterior análisis.
 
-## Requisitos
+### Niveles de Log
 
-- Node.js 18+
-- MongoDB local o URI de Atlas
+Se utilizan los siguientes niveles (de menor a mayor importancia):
+`debug`, `http`, `info`, `warning`, `error`, `fatal`.
 
-## Instalación
+### Endpoint de Prueba
 
-```bash
-git clone <url-del-repo>
-cd shipnow-preentrega-1
-npm install
-cp .env.example .env
-# Editar .env con tus valores reales
-npm start
-```
+Para verificar que todos los niveles funcionan, podés hacer una petición GET a:
+`GET /api/logger/test`
 
-## Variables de entorno
+Esto generará mensajes en la consola y en los archivos de log.
 
-| Variable      | Descripción                                 | Ejemplo                             |
-| ------------- | ------------------------------------------- | ----------------------------------- |
-| `PORT`        | Puerto del servidor                         | `3000`                              |
-| `MONGODB_URI` | URI de conexión a MongoDB                   | `mongodb://localhost:27017/shipnow` |
-| `NODE_ENV`    | Entorno (`development`/`production`/`test`) | `development`                       |
+### Persistencia y Rotación
 
-Si falta alguna, la app **no arranca** y muestra un error descriptivo.
+Los logs se guardan en la carpeta `logs/` en la raíz del proyecto. Se utiliza rotación diaria (`winston-daily-rotate-file`).
 
-## Endpoints
+- `logs/error-YYYY-MM-DD.log`: Guarda únicamente los niveles `warning`, `error` y `fatal`.
+- `logs/combined-YYYY-MM-DD.log`: Guarda todos los niveles.
 
-### Productos
+> ⚠️ **Nota:** La carpeta `logs/` y los archivos `.log` están incluidos en el `.gitignore` y **no** se suben al repositorio.
 
-- `GET /api/products` — lista (solo con stock por defecto; `?includeOutOfStock=true` para todos)
-- `GET /api/products/:id`
-- `POST /api/products`
-- `PUT /api/products/:id`
-- `DELETE /api/products/:id`
+### Comportamiento por Entorno
 
-### Usuarios
-
-- `GET /api/users` — lista (filtro opcional `?role=ADMIN`)
-- `GET /api/users/:id`
-- `POST /api/users`
-
-## Decisiones de diseño
-
-**¿Por qué separé Service y Repository?**
-El Repository encapsula el acceso a MongoDB: filtros por defecto (ej. `stock > 0`),
-proyecciones (`-__v`) y `lean()` para respuestas más livianas. El Service contiene
-las reglas de negocio que no dependen de la base de datos: validación de precio no
-negativo, email único, coherencia entre `stock` y `status`, y traducción de "no
-encontrado" a un error con `statusCode`. Si mañana cambia la regla de negocio,
-solo toco el Service; si cambia cómo se consulta Mongo, solo toco el Repository.
-El Controller nunca sabe que existe Mongoose.
-
-## Pruebas Endpoints
-
-Prueba 1: creé producto con stock → status: "AVAILABLE".  
-Prueba 2: creé producto con stock: 0 → status: "OUT_OF_STOCK".  
-Prueba 3: listé sin query → solo productos con stock.  
-Prueba 4: listé con ?includeOutOfStock=true → todos.  
-Prueba 5: creé usuario → role: "USER".  
-Prueba 6: GET de id inexistente → {"error":"Producto no encontrado"} (404).  
-Prueba 7: POST con precio negativo → {"error":"El precio no puede ser negativo"} (400).
-
-## Versión
-
-`v0.1.0-pre1` — Pre-entrega 1
+- **Desarrollo (`NODE_ENV=development`)**: Se muestran todos los logs (incluyendo `debug` y `http`).
+- **Producción (`NODE_ENV=production`)**: Solo se muestran y guardan logs desde nivel `info` en adelante.

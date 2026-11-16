@@ -8,36 +8,42 @@ const {
 } = require("../constants");
 const { ERROR_CODES } = require("../constants/errors.constants");
 const AppError = require("../utils/AppError");
+const logger = require("../config/logger"); // <-- NUEVO
 
 class MockService {
-  // NUEVO: Función auxiliar para validar la cantidad
   validateQuantity(qty) {
-    // Si no es un número o es menor o igual a 0, lanzamos error
     if (isNaN(qty) || qty <= 0) {
+      logger.warning(
+        `Intento de generar mocks con cantidad inválida: '${qty}'`,
+      ); // <-- NUEVO
       throw new AppError(ERROR_CODES.INVALID_QUANTITY);
     }
   }
 
   generateMockUsers(qty = 10) {
-    this.validateQuantity(qty); // <-- Validación
+    this.validateQuantity(qty);
+    logger.debug(`Generando ${qty} usuarios mock en memoria`); // <-- NUEVO
     // ... (resto del código de generación igual)
   }
 
-  // ... generateMockProducts ...
-
   async seedDatabase(qty = 10) {
-    this.validateQuantity(qty); // <-- Validación
+    this.validateQuantity(qty);
     try {
-      // ... (todo el código de generación y guardado)
+      logger.info(`Iniciando carga de datos de prueba en DB (qty=${qty})`); // <-- NUEVO
+      // ... (resto del código de guardado)
+      logger.info(
+        `Carga de mocks exitosa: ${savedUsers.length} usuarios, ${orders.length} pedidos...`,
+      ); // <-- NUEVO
       return { users: savedUsers.length /* ... */ };
     } catch (error) {
-      // Si falla algo en Mongo (ej. conexión perdida), lanzamos un error controlado
       if (!error.isOperational) {
+        logger.error(
+          `Fallo al insertar datos mock en MongoDB: ${error.message}`,
+        ); // <-- NUEVO
         throw new AppError(ERROR_CODES.SEED_ERROR);
       }
-      throw error; // Si ya es un AppError, lo dejamos pasar
+      throw error;
     }
   }
 }
-
 module.exports = new MockService();
