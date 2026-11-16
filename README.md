@@ -27,3 +27,21 @@ Los logs se guardan en la carpeta `logs/` en la raíz del proyecto. Se utiliza r
 
 - **Desarrollo (`NODE_ENV=development`)**: Se muestran todos los logs (incluyendo `debug` y `http`).
 - **Producción (`NODE_ENV=production`)**: Solo se muestran y guardan logs desde nivel `info` en adelante.
+
+## Módulo 6: Testing Funcional
+
+Se implementó una suite de tests funcionales automatizados para garantizar la estabilidad de la API.
+
+### Herramientas
+
+- **Mocha**: Organización y ejecución de tests.
+- **Chai**: Aserciones y validación de respuestas.
+- **Supertest**: Simulación de peticiones HTTP sin levantar un servidor real.
+
+### ¿Cómo ejecutar los tests?
+
+1. Asegurarse de tener MongoDB corriendo (la suite usará una base de datos separada llamada `shipnow_test`).
+2. En la terminal, ejecutá:
+   ```bash
+   npm test
+   ```
