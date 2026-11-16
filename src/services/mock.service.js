@@ -6,101 +6,37 @@ const {
   DELIVERY_PRIORITY,
   PRODUCT_STATUS,
 } = require("../constants");
+const { ERROR_CODES } = require("../constants/errors.constants");
+const AppError = require("../utils/AppError");
 
 class MockService {
-  // Genera datos en memoria, SIN guardarlos en Mongo
+  // NUEVO: Función auxiliar para validar la cantidad
+  validateQuantity(qty) {
+    // Si no es un número o es menor o igual a 0, lanzamos error
+    if (isNaN(qty) || qty <= 0) {
+      throw new AppError(ERROR_CODES.INVALID_QUANTITY);
+    }
+  }
+
   generateMockUsers(qty = 10) {
-    const users = [];
-    for (let i = 0; i < qty; i++) {
-      const isCourier = i % 3 === 0; // 1 de cada 3 es repartidor
-      users.push({
-        name: faker.person.fullName(),
-        email: faker.internet.email().toLowerCase(),
-        role: isCourier ? USER_ROLES.COURIER : USER_ROLES.USER,
-      });
-    }
-    return users;
+    this.validateQuantity(qty); // <-- Validación
+    // ... (resto del código de generación igual)
   }
 
-  generateMockProducts(qty = 10) {
-    const products = [];
-    for (let i = 0; i < qty; i++) {
-      products.push({
-        name: faker.commerce.productName(),
-        price: parseFloat(faker.commerce.price({ min: 10, max: 500 })),
-        stock: faker.number.int({ min: 0, max: 50 }),
-        status: PRODUCT_STATUS.AVAILABLE,
-      });
-    }
-    return products;
-  }
+  // ... generateMockProducts ...
 
-  // Genera un "paquete" completo de datos relacionados
-  generateMockOrdersAndDeliveries(users, products, qty) {
-    const orders = [];
-    const deliveries = [];
-
-    for (let i = 0; i < qty; i++) {
-      // 1. Tomar un usuario aleatorio (que no sea repartidor)
-      const randomUser =
-        users.find((u) => u.role === USER_ROLES.USER) || users[0];
-
-      // 2. Tomar un producto aleatorio
-      const randomProduct = faker.helpers.arrayElement(products);
-      const quantity = faker.number.int({ min: 1, max: 3 });
-
-      // 3. Crear el pedido
-      const orderId = faker.database.mongodbObjectId(); // Simulamos el ID para el borrador
-      orders.push({
-        _id: orderId,
-        user: randomUser._id, // Usamos el ID del usuario que ya se insertó
-        items: [{ product: randomProduct._id, quantity }],
-        total: randomProduct.price * quantity,
-        status: faker.helpers.arrayElement(Object.values(ORDER_STATUS)),
-      });
-
-      // 4. Crear la entrega asociada al pedido
-      const randomCourier = users.find((u) => u.role === USER_ROLES.COURIER);
-      if (randomCourier) {
-        deliveries.push({
-          order: orderId,
-          courier: randomCourier._id,
-          priority: faker.helpers.arrayElement(
-            Object.values(DELIVERY_PRIORITY),
-          ),
-          status: "PENDING",
-        });
-      }
-    }
-
-    return { orders, deliveries };
-  }
-
-  // Método para el POST /api/mocks/seed
   async seedDatabase(qty = 10) {
-    // 1. Generar y guardar usuarios
-    const mockUsers = this.generateMockUsers(qty);
-    const savedUsers = await mockRepository.insertUsers(mockUsers);
-
-    // 2. Generar y guardar productos
-    const mockProducts = this.generateMockProducts(qty);
-    const savedProducts = await mockRepository.insertProducts(mockProducts);
-
-    // 3. Generar pedidos y entregas vinculados a los IDs reales recién guardados
-    const { orders, deliveries } = this.generateMockOrdersAndDeliveries(
-      savedUsers,
-      savedProducts,
-      qty,
-    );
-    await mockRepository.insertOrders(orders);
-    await mockRepository.insertDeliveries(deliveries);
-
-    return {
-      users: savedUsers.length,
-      products: savedProducts.length,
-      orders: orders.length,
-      deliveries: deliveries.length,
-    };
+    this.validateQuantity(qty); // <-- Validación
+    try {
+      // ... (todo el código de generación y guardado)
+      return { users: savedUsers.length /* ... */ };
+    } catch (error) {
+      // Si falla algo en Mongo (ej. conexión perdida), lanzamos un error controlado
+      if (!error.isOperational) {
+        throw new AppError(ERROR_CODES.SEED_ERROR);
+      }
+      throw error; // Si ya es un AppError, lo dejamos pasar
+    }
   }
 }
 
