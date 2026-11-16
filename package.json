@@ -1,0 +1,22 @@
+{
+  "name": "shipnow-preentrega-1",
+  "version": "0.1.0",
+  "description": "ShipNow — Pre-entrega 1: arquitectura por capas + config validada",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "shipnow",
+    "backend",
+    "express",
+    "mongoose"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.4.0"
+  }
+}
