@@ -58,14 +58,13 @@ El Controller nunca sabe que existe Mongoose.
 
 ## Pruebas Endpoints
 
-Prueba 1: creé producto con stock → status: "AVAILABLE".
-Prueba 2: creé producto con stock: 0 → status: "OUT_OF_STOCK".
-Prueba 3: listé sin query → solo productos con stock.
-Prueba 4: listé con ?includeOutOfStock=true → todos.
-Prueba 5: creé usuario → role: "USER".
-Prueba 6: GET de id inexistente → {"error":"Producto no encontrado"} (404).
+Prueba 1: creé producto con stock → status: "AVAILABLE".  
+Prueba 2: creé producto con stock: 0 → status: "OUT_OF_STOCK".  
+Prueba 3: listé sin query → solo productos con stock.  
+Prueba 4: listé con ?includeOutOfStock=true → todos.  
+Prueba 5: creé usuario → role: "USER".  
+Prueba 6: GET de id inexistente → {"error":"Producto no encontrado"} (404).  
 Prueba 7: POST con precio negativo → {"error":"El precio no puede ser negativo"} (400).
-Detuve el server con Ctrl + C al terminar.
 
 ## Versión
 
