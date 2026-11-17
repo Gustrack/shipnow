@@ -20,6 +20,28 @@ const ERROR_CODES = Object.freeze({
     message:
       "Error al intentar insertar los datos de prueba en la base de datos",
   },
+
+  // Archivos y Carga (Módulo 7)
+  FILE_REQUIRED: {
+    status: 400,
+    message: "El archivo es requerido",
+  },
+  INVALID_FILE_TYPE: {
+    status: 400,
+    message: "Tipo de archivo no permitido. Solo se aceptan PDF, JPG o PNG",
+  },
+  FILE_TOO_LARGE: {
+    status: 400,
+    message: "El archivo supera el límite de tamaño permitido (5MB)",
+  },
+  INVALID_DOCUMENT_TYPE: {
+    status: 400,
+    message: "El tipo de documento no es válido",
+  },
+  UPLOAD_ERROR: {
+    status: 500,
+    message: "Error al intentar guardar el archivo",
+  },
 });
 
 module.exports = { ERROR_CODES };

@@ -30,6 +30,7 @@ const options = {
         name: "Logger",
         description: "Herramienta interna de validación de logs",
       },
+      { name: "Uploads", description: "Carga de archivos y documentos" }, // <-- NUEVO
     ],
     components: {
       schemas: {
