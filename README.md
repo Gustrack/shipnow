@@ -45,3 +45,19 @@ Se implementó una suite de tests funcionales automatizados para garantizar la e
    ```bash
    npm test
    ```
+
+### Entorno de Testing
+
+Los tests se ejecutan con NODE_ENV=test. Las variables de entorno específicas están en el archivo .env.test (el cual apunta a una base de datos separada llamada shipnow_test, manteniendo intactos tus datos de desarrollo).
+
+### Módulos cubiertos por los tests
+
+Users: Listado correcto, manejo de roles inválidos, creación exitosa y errores de validación.  
+Mocks: Generación exitosa, validación de cantidad negativa y no numérica, carga exitosa en DB.  
+Logger: Endpoint de generación de logs.  
+Swagger: Disponibilidad de la interfaz de documentación.  
+Global Errors: Rutas inexistentes y recursos no encontrados (404).
+
+### Estrategia de limpieza
+
+Antes de ejecutar los tests, la suite se conecta a la DB de testing y limpia las colecciones (ej. User.deleteMany({})) para asegurar que los datos son controlados, repetibles y no dependen del estado previo.
