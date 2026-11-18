@@ -57,6 +57,8 @@ El servidor estará escuchando en http://localhost:3000.
 
 # Documentación de la API (Swagger)
 
+![Vista previa de Swagger UI](./src/docs/images/swagger-preview.png)
+
 La API cuenta con documentación interactiva donde podés consultar y probar todos los endpoints en vivo.
 
 1. Levantá el servidor (npm start).
@@ -70,6 +72,8 @@ La API cuenta con documentación interactiva donde podés consultar y probar tod
 - Mocks: Generación de datos falsos en memoria y carga de datos de prueba en DB.
 - Logger: Endpoint de prueba interna para validar los niveles de Winston.
 - Uploads: Carga de documentos de usuario (multipart/form-data).
+- Orders: Listado y búsqueda de pedidos.
+- Deliveries: Listado y búsqueda de entregas.
 
 # Schemas reutilizables:
 
@@ -196,3 +200,4 @@ shipnow/
 ├── .env.example # Variables de entorno de ejemplo  
 ├── .mocharc.json # Configuración de Mocha (opcional)  
 └── package.json
+
