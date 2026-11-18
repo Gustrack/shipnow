@@ -179,22 +179,23 @@ Este repositorio utiliza Git Tags para marcar la evolución del proyecto. Podés
 
 # Estructura del Proyecto
 
-shipnow/  
-├── src/  
-│ ├── config/ # Configuración de entorno,logger y Multer  
-│ ├── constants/ # Diccionarios de roles, estados y errores
-│ ├── controllers/ # Puerta de entrada HTTP (req/res)  
-│ ├── docs/ # Configuración de Swagger  
-│ ├── middlewares/ # Manejo global de errores y logs HTTP  
-│ ├── models/ # Esquemas de Mongoose  
-│ ├── repositories/ # Acceso a datos (MongoDB)  
-│ ├── routes/ # Definición de endpoints  
-│ ├── services/ # Lógica de negocio  
-│ ├── utils/ # Clases utilitarias (AppError)  
-│ ├── app.js # Configuración de Express  
-│ └── server.js # Levantamiento del servidor y conexión a DB  
-├── tests/ # Suite de tests funcionales (Mocha/Chai/Supertest)  
-├── uploads/ # Archivos subidos (ignorado en Git)  
-├── .env.example # Variables de entorno de ejemplo  
-├── .mocharc.json # Configuración de Mocha (opcional)  
+shipnow/
+├── src/
+│   ├── config/          # Configuración de entorno, logger y Multer
+│   ├── constants/       # Diccionarios de roles, estados y errores
+│   ├── controllers/     # Puerta de entrada HTTP (req/res)
+│   ├── docs/            # Configuración de Swagger e imágenes
+│   │   └── images/      # Capturas para el README
+│   ├── middlewares/     # Manejo global de errores y logs HTTP
+│   ├── models/          # Esquemas de Mongoose
+│   ├── repositories/    # Acceso a datos (MongoDB)
+│   ├── routes/          # Definición de endpoints
+│   ├── services/        # Lógica de negocio
+│   ├── utils/           # Clases utilitarias (AppError)
+│   ├── app.js           # Configuración de Express
+│   └── server.js        # Levantamiento del servidor y conexión a DB
+├── tests/               # Suite de tests funcionales (Mocha/Chai/Supertest)
+├── uploads/             # Archivos subidos (ignorado en Git)
+├── .env.example         # Variables de entorno de ejemplo
+├── .mocharc.json        # Configuración de Mocha (opcional)
 └── package.json
