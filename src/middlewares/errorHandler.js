@@ -1,6 +1,6 @@
 const { ERROR_CODES } = require("../constants/errors.constants");
 const logger = require("../config/logger");
-const multer = require("multer"); // <-- NUEVO
+const multer = require("multer");
 
 const errorHandler = (err, req, res, next) => {
   // 1. Atrapar errores específicos de Multer (ej. tamaño excedido)
@@ -9,11 +9,16 @@ const errorHandler = (err, req, res, next) => {
       logger.warning(`Intento de subir archivo demasiado grande en ${req.url}`);
       return res.status(400).json({
         status: "error",
+        code: ERROR_CODES.FILE_TOO_LARGE.code, // <-- Agregamos el código
         message: ERROR_CODES.FILE_TOO_LARGE.message,
       });
     }
     // Otros errores de Multer
-    return res.status(400).json({ status: "error", message: err.message });
+    return res.status(400).json({
+      status: "error",
+      code: "ERR_MULTER", // <-- Agregamos un código genérico
+      message: err.message,
+    });
   }
 
   // 2. Errores operativos controlados (AppError)
@@ -30,6 +35,7 @@ const errorHandler = (err, req, res, next) => {
 
     return res.status(err.statusCode).json({
       status: "error",
+      code: err.code || "ERR_OPERATIONAL",
       message: err.message,
     });
   }
@@ -41,6 +47,7 @@ const errorHandler = (err, req, res, next) => {
 
   return res.status(500).json({
     status: "error",
+    code: ERROR_CODES.INTERNAL_ERROR.code, // <-- Agregamos el código
     message: ERROR_CODES.INTERNAL_ERROR.message,
   });
 };

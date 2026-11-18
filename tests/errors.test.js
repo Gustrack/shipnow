@@ -14,6 +14,14 @@ describe("Global Errors API", () => {
     expect(res.body.message).to.equal("Producto no encontrado");
   });
 
+  // NUEVO: Validar el 404 para Usuarios
+  it("Debería devolver 404 al pedir un usuario inexistente", async () => {
+    const res = await request(app).get("/api/users/000000000000000000000000");
+    expect(res.status).to.equal(404);
+    expect(res.body.status).to.equal("error");
+    expect(res.body.message).to.equal("Usuario no encontrado");
+  });
+
   it("Debería devolver 404 en una ruta que no existe", async () => {
     const res = await request(app).get("/api/ruta-fantasma");
     expect(res.status).to.equal(404);

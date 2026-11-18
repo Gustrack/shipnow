@@ -7,7 +7,8 @@ const productRouter = require("./routes/product.router");
 const userRouter = require("./routes/user.router");
 const mockRouter = require("./routes/mock.router");
 const loggerRouter = require("./routes/logger.router");
-const uploadRouter = require("./routes/upload.router"); // <-- NUEVO
+const uploadRouter = require("./routes/upload.router");
+const orderRouter = require("./routes/order.router");
 
 const errorHandler = require("./middlewares/errorHandler");
 const logger = require("./config/logger");
@@ -26,7 +27,8 @@ app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 app.use("/api/mocks", mockRouter);
 app.use("/api/logger", loggerRouter);
-app.use("/api/uploads", uploadRouter); // <-- NUEVO
+app.use("/api/uploads", uploadRouter);
+app.use("/api/orders", orderRouter);
 
 // Ruta de Swagger
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
