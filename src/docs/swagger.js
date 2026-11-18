@@ -33,7 +33,9 @@ const options = {
     ],
     components: {
       schemas: {
-        // 1. Schemas de Entidades
+        // ==========================================
+        // 1. SCHEMAS DE ENTIDADES PRINCIPALES
+        // ==========================================
         User: {
           type: "object",
           properties: {
@@ -61,6 +63,16 @@ const options = {
             },
           },
         },
+
+        // Schema específico para el Item del pedido (Requisito de la rúbrica)
+        OrderItem: {
+          type: "object",
+          properties: {
+            product: { type: "string", example: "65f1234567890abcdef12345" },
+            quantity: { type: "number", example: 2 },
+          },
+        },
+
         Order: {
           type: "object",
           properties: {
@@ -69,14 +81,7 @@ const options = {
             items: {
               type: "array",
               items: {
-                type: "object",
-                properties: {
-                  product: {
-                    type: "string",
-                    example: "65f1234567890abcdef12345",
-                  },
-                  quantity: { type: "number", example: 2 },
-                },
+                $ref: "#/components/schemas/OrderItem",
               },
             },
             total: { type: "number", example: 100 },
@@ -101,25 +106,31 @@ const options = {
             status: { type: "string", example: "PENDING" },
           },
         },
-        // 2. Schemas de Respuestas
+
+        // ==========================================
+        // 2. SCHEMAS DE RESPUESTAS (Éxito y Error)
+        // ==========================================
         SuccessResponse: {
           type: "object",
           properties: {
-            data: { type: "object" },
+            data: {
+              type: "object",
+              description: "Objeto o array de datos devuelto por la API",
+            },
           },
         },
         ErrorResponse: {
           type: "object",
           properties: {
             status: { type: "string", example: "error" },
-            message: { type: "string", example: "Descripción del error" },
+            message: { type: "string", example: "Producto no encontrado" },
           },
         },
       },
     },
   },
   // Le decimos a swagger-jsdoc dónde buscar los comentarios de documentación
-  apis: ["./src/routes/*.js"], // Ruta relativa desde la raíz
+  apis: ["./src/routes/*.js"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);

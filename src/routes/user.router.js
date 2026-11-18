@@ -92,9 +92,12 @@ router.get("/:id", userController.getById);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
- *       409:
- *         description: El email ya está registrado
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Datos inválidos (email duplicado o rol inválido)
  *         content:
  *           application/json:
  *             schema:

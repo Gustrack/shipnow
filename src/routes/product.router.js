@@ -20,9 +20,18 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Product'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get("/", productController.getAll);
 
@@ -44,7 +53,10 @@ router.get("/", productController.getAll);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Product'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Product'
  *       404:
  *         description: Producto no encontrado
  *         content:
@@ -79,11 +91,14 @@ router.get("/:id", productController.getById);
  *                 example: 10
  *     responses:
  *       201:
- *         description: Producto creado
+ *         description: Producto creado exitosamente
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Product'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Product'
  *       400:
  *         description: Validación fallida (ej. precio negativo)
  *         content:
