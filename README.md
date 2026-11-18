@@ -57,6 +57,8 @@ El servidor estará escuchando en http://localhost:3000.
 
 # Documentación de la API (Swagger)
 
+![Vista previa de Swagger UI](./src/docs/images/swagger-preview.png)
+
 La API cuenta con documentación interactiva donde podés consultar y probar todos los endpoints en vivo.
 
 1. Levantá el servidor (npm start).
