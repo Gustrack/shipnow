@@ -1,16 +1,28 @@
 const { ERROR_CODES } = require("../constants/errors.constants");
-const logger = require("../config/logger"); // <-- NUEVO
+const logger = require("../config/logger");
+const multer = require("multer"); // <-- NUEVO
 
 const errorHandler = (err, req, res, next) => {
-  // Si es un error operativo (lanzado por nosotros con AppError)
+  // 1. Atrapar errores específicos de Multer (ej. tamaño excedido)
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      logger.warning(`Intento de subir archivo demasiado grande en ${req.url}`);
+      return res.status(400).json({
+        status: "error",
+        message: ERROR_CODES.FILE_TOO_LARGE.message,
+      });
+    }
+    // Otros errores de Multer
+    return res.status(400).json({ status: "error", message: err.message });
+  }
+
+  // 2. Errores operativos controlados (AppError)
   if (err.isOperational) {
-    // Los errores de negocio (400, 404) se registran como "warning"
     if (err.statusCode >= 400 && err.statusCode < 500) {
       logger.warning(
         `Error de negocio [${req.method} ${req.url}]: ${err.message}`,
       );
     } else {
-      // Errores 500 controlados se registran como "error"
       logger.error(
         `Error interno controlado [${req.method} ${req.url}]: ${err.message}`,
       );
@@ -22,7 +34,7 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
-  // Si es un error NO controlado (un bug, fallo de sintaxis, caída de DB)
+  // 3. Errores inesperados (bugs, fallos de sintaxis, caída de DB)
   logger.error(
     `Error inesperado del servidor [${req.method} ${req.url}]: ${err.message}`,
   );
