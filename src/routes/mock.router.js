@@ -78,4 +78,28 @@ router.get("/products", mockController.getMockProducts);
  */
 router.post("/seed", mockController.seedData);
 
+/**
+ * @openapi
+ * /mocks/orders:
+ *   get:
+ *     summary: Generar pedidos simulados (sin guardar en DB)
+ *     tags: [Mocks]
+ *     responses:
+ *       200:
+ *         description: Lista de pedidos generados
+ */
+router.get("/orders", mockController.getMockOrders);
+
+/**
+ * @openapi
+ * /mocks/deliveries:
+ *   get:
+ *     summary: Generar entregas simuladas (sin guardar en DB)
+ *     tags: [Mocks]
+ *     responses:
+ *       200:
+ *         description: Lista de entregas generadas
+ */
+router.get("/deliveries", mockController.getMockDeliveries);
+
 module.exports = router;

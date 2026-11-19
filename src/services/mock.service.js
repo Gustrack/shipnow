@@ -59,6 +59,41 @@ class MockService {
     return products;
   }
 
+  generateMockOrders(qty = 10) {
+    this.validateQuantity(qty);
+    const orders = [];
+    for (let i = 0; i < qty; i++) {
+      orders.push({
+        _id: faker.database.mongodbObjectId(),
+        user: faker.database.mongodbObjectId(),
+        items: [
+          {
+            product: faker.database.mongodbObjectId(),
+            quantity: faker.number.int({ min: 1, max: 3 }),
+          },
+        ],
+        total: parseFloat(faker.commerce.price({ min: 50, max: 1000 })),
+        status: faker.helpers.arrayElement(Object.values(ORDER_STATUS)),
+      });
+    }
+    return orders;
+  }
+
+  generateMockDeliveries(qty = 10) {
+    this.validateQuantity(qty);
+    const deliveries = [];
+    for (let i = 0; i < qty; i++) {
+      deliveries.push({
+        _id: faker.database.mongodbObjectId(),
+        order: faker.database.mongodbObjectId(),
+        courier: faker.database.mongodbObjectId(),
+        priority: faker.helpers.arrayElement(Object.values(DELIVERY_PRIORITY)),
+        status: DELIVERY_STATUS.PENDING,
+      });
+    }
+    return deliveries;
+  }
+
   // Genera órdenes y entregas en memoria usando datos ya existentes
   generateMockOrdersAndDeliveries(users, products, qty) {
     this.validateQuantity(qty);

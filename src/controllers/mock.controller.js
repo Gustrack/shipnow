@@ -40,6 +40,26 @@ class MockController {
       next(error);
     }
   }
+
+  getMockOrders(req, res, next) {
+    try {
+      const qty = req.query.qty ? parseInt(req.query.qty) : 10;
+      const orders = mockService.generateMockOrders(qty);
+      res.status(200).json({ data: orders });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  getMockDeliveries(req, res, next) {
+    try {
+      const qty = req.query.qty ? parseInt(req.query.qty) : 10;
+      const deliveries = mockService.generateMockDeliveries(qty);
+      res.status(200).json({ data: deliveries });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new MockController();
