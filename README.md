@@ -55,6 +55,71 @@ npm start
 
 El servidor estará escuchando en http://localhost:3000.
 
+## Módulo 2: Mocking y Carga de Datos
+
+Esta versión incorpora un sistema para generar datos de prueba utilizando `@faker-js/faker`, respetando las relaciones y constantes del dominio.
+
+### Endpoints disponibles (sin guardar en DB)
+
+- **`GET /api/mocks/users?qty=5`**: Devuelve un array de usuarios simulados (mezcla roles `USER` y `COURIER`).
+- **`GET /api/mocks/couriers?qty=5`**: Devuelve únicamente usuarios con rol `COURIER`.
+- **`GET /api/mocks/products?qty=5`**: Devuelve productos simulados respetando la coherencia entre `stock` y `status` (si el stock es 0, el estado es `OUT_OF_STOCK`).
+
+### Endpoint de carga en DB
+
+- **`POST /api/mocks/seed?qty=10`**: Genera usuarios, productos, pedidos y entregas, y los inserta en MongoDB respetando las relaciones (pedido ↔ usuario, entrega ↔ pedido).
+
+### Ejemplos de uso
+
+**Obtener 3 usuarios simulados:**
+
+```bash
+curl http://localhost:3000/api/mocks/users?qty=3
+```
+
+Respuesta:
+
+```json
+{
+  "data": [
+    { "name": "Ana Pérez", "email": "ana@test.com", "role": "USER" },
+    { "name": "Luis Gómez", "email": "luis@test.com", "role": "COURIER" },
+    { "name": "Carlos Ruiz", "email": "carlos@test.com", "role": "USER" }
+  ]
+}
+```
+
+### Insertar datos de prueba en la DB:
+
+```bash
+curl -X POST http://localhost:3000/api/mocks/seed?qty=10
+```
+
+Respuesta:
+
+```json
+{
+  "message": "Datos insertados",
+  "insertados": { "users": 10, "products": 10, "orders": 10, "deliveries": 10 }
+}
+```
+
+### Verificación en MongoDB:
+
+Luego de ejecutar el seed, podés abrir MongoDB Compass y revisar las colecciones `users`, `products`, `orders` y `deliveries` para confirmar que los registros se insertaron con los ObjectIds relacionados correctamente.
+
+_Vista de la colección `users` (usuarios y repartidores generados):_
+![Mocks Users en MongoDB](./src/docs/images/mongo-users.png)
+
+_Vista de la colección `products` (relación con el usuario):_
+![Mocks Orders en MongoDB](./src/docs/images/mongo-products.png)
+
+_Vista de la colección `orders` (relación con el usuario):_
+![Mocks Orders en MongoDB](./src/docs/images/mongo-orders.png)
+
+_Vista de la colección `deliveries` (relación con el pedido y el repartidor):_
+![Mocks Deliveries en MongoDB](./src/docs/images/mongo-deliveries.png)
+
 # Documentación de la API (Swagger)
 
 ![Vista previa de Swagger UI](./src/docs/swagger-preview.png)
@@ -181,21 +246,21 @@ Este repositorio utiliza Git Tags para marcar la evolución del proyecto. Podés
 
 shipnow/  
 ├── src/  
-│   ├── config/          # Configuración de entorno, logger y Multer  
-│   ├── constants/       # Diccionarios de roles, estados y errores  
-│   ├── controllers/     # Puerta de entrada HTTP (req/res)  
-│   ├── docs/            # Configuración de Swagger e imágenes  
-│   │   └── images/      # Capturas para el README  
-│   ├── middlewares/     # Manejo global de errores y logs HTTP  
-│   ├── models/          # Esquemas de Mongoose  
-│   ├── repositories/    # Acceso a datos (MongoDB)  
-│   ├── routes/          # Definición de endpoints  
-│   ├── services/        # Lógica de negocio  
-│   ├── utils/           # Clases utilitarias (AppError)  
-│   ├── app.js           # Configuración de Express  
-│   └── server.js        # Levantamiento del servidor y conexión a DB  
-├── tests/               # Suite de tests funcionales (Mocha/Chai/Supertest)  
-├── uploads/             # Archivos subidos (ignorado en Git)  
-├── .env.example         # Variables de entorno de ejemplo  
-├── .mocharc.json        # Configuración de Mocha (opcional)  
-└── package.json  
+│ ├── config/ # Configuración de entorno, logger y Multer  
+│ ├── constants/ # Diccionarios de roles, estados y errores  
+│ ├── controllers/ # Puerta de entrada HTTP (req/res)  
+│ ├── docs/ # Configuración de Swagger e imágenes  
+│ │ └── images/ # Capturas para el README  
+│ ├── middlewares/ # Manejo global de errores y logs HTTP  
+│ ├── models/ # Esquemas de Mongoose  
+│ ├── repositories/ # Acceso a datos (MongoDB)  
+│ ├── routes/ # Definición de endpoints  
+│ ├── services/ # Lógica de negocio  
+│ ├── utils/ # Clases utilitarias (AppError)  
+│ ├── app.js # Configuración de Express  
+│ └── server.js # Levantamiento del servidor y conexión a DB  
+├── tests/ # Suite de tests funcionales (Mocha/Chai/Supertest)  
+├── uploads/ # Archivos subidos (ignorado en Git)  
+├── .env.example # Variables de entorno de ejemplo  
+├── .mocharc.json # Configuración de Mocha (opcional)  
+└── package.json

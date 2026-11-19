@@ -13,24 +13,50 @@ const router = express.Router();
  *         name: qty
  *         schema:
  *           type: integer
- *         description: Cantidad de usuarios a generar (por defecto 10)
+ *         description: Cantidad (por defecto 10)
  *     responses:
  *       200:
  *         description: Lista de usuarios generados
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
  *       400:
- *         description: Cantidad inválida (negativa o no numérica)
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         description: Cantidad inválida
  */
 router.get("/users", mockController.getMockUsers);
+
+/**
+ * @openapi
+ * /mocks/couriers:
+ *   get:
+ *     summary: Generar repartidores simulados (sin guardar en DB)
+ *     tags: [Mocks]
+ *     parameters:
+ *       - in: query
+ *         name: qty
+ *         schema:
+ *           type: integer
+ *         description: Cantidad (por defecto 10)
+ *     responses:
+ *       200:
+ *         description: Lista de repartidores (rol COURIER)
+ */
+router.get("/couriers", mockController.getMockCouriers);
+
+/**
+ * @openapi
+ * /mocks/products:
+ *   get:
+ *     summary: Generar productos simulados (sin guardar en DB)
+ *     tags: [Mocks]
+ *     parameters:
+ *       - in: query
+ *         name: qty
+ *         schema:
+ *           type: integer
+ *         description: Cantidad (por defecto 10)
+ *     responses:
+ *       200:
+ *         description: Lista de productos generados
+ */
+router.get("/products", mockController.getMockProducts);
 
 /**
  * @openapi
@@ -49,16 +75,6 @@ router.get("/users", mockController.getMockUsers);
  *         description: Datos insertados correctamente
  *       400:
  *         description: Cantidad inválida
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       500:
- *         description: Error al insertar en la base de datos
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post("/seed", mockController.seedData);
 
