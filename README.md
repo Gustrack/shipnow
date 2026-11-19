@@ -120,9 +120,63 @@ _Vista de la colección `orders` (relación con el usuario):_
 _Vista de la colección `deliveries` (relación con el pedido y el repartidor):_
 ![Mocks Deliveries en MongoDB](./src/docs/images/mongo-deliveries.png)
 
+## Módulo 3: Manejo Profesional de Errores
+
+La API cuenta con una capa centralizada de manejo de errores. Los servicios lanzan instancias de `AppError` utilizando un diccionario predefinido (`src/constants/errors.constants.js`). Un middleware global intercepta estos errores y formatea la respuesta final al cliente.
+
+### Estructura de error uniforme
+
+Todos los errores devuelven el mismo formato JSON:
+
+```json
+{
+  "status": "error",
+  "code": "ERR_EJEMPLO",
+  "message": "Descripción clara del error"
+}
+```
+
+### Casos de prueba (Módulo de Mocks)
+
+- Cantidad inválida (negativa):
+
+```bash
+curl "http://localhost:3000/api/mocks/users?qty=-5"
+```
+
+Respuesta: `400 Bad Request` con mensaje "La cantidad debe ser un número entero positivo mayor a 0".
+
+- Cantidad no numérica:
+
+```bash
+curl "http://localhost:3000/api/mocks/users?qty=abc"
+```
+
+Respuesta: `400 Bad Request` con el mismo mensaje.
+
+### Casos de prueba (Manejo de ID inválido)
+
+- ID de Mongoose inválido:
+
+```bash
+curl "http://localhost:3000/api/products/123"
+```
+
+Respuesta: `400 Bad Request` con mensaje "El ID proporcionado no es válido" (código `ERR_INVALID_ID`).
+
+### Casos de prueba (Recurso no encontrado)
+
+- Producto inexistente:
+
+```bash
+curl "http://localhost:3000/api/products/000000000000000000000000"
+```
+
+Respuesta: `404 Not Found` con mensaje "Producto no encontrado".
+
 # Documentación de la API (Swagger)
 
-![Vista previa de Swagger UI](./src/docs/swagger-preview.png)
+![Vista previa de Swagger UI](./src/docs/images/swagger-preview.png)
 
 La API cuenta con documentación interactiva donde podés consultar y probar todos los endpoints en vivo.
 

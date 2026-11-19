@@ -10,6 +10,11 @@ const ERROR_CODES = Object.freeze({
     code: "ERR_VALIDATION",
     message: "Error de validación de datos",
   },
+  INVALID_ID: {
+    status: 400,
+    code: "ERR_INVALID_ID",
+    message: "El ID proporcionado no es válido",
+  }, // <-- NUEVO para CastError
 
   // Usuarios y Productos
   USER_NOT_FOUND: {
@@ -38,7 +43,7 @@ const ERROR_CODES = Object.freeze({
     message: "El rol proporcionado no es válido",
   },
 
-  // Pedidos y Entregas (Módulo 6)
+  // Pedidos y Entregas
   ORDER_NOT_FOUND: {
     status: 404,
     code: "ERR_ORDER_NOT_FOUND",
@@ -55,7 +60,7 @@ const ERROR_CODES = Object.freeze({
     message: "Entrega no encontrada",
   },
 
-  // Mocks (Módulo 3)
+  // Mocks
   INVALID_QUANTITY: {
     status: 400,
     code: "ERR_INVALID_QUANTITY",
@@ -68,7 +73,7 @@ const ERROR_CODES = Object.freeze({
       "Error al intentar insertar los datos de prueba en la base de datos",
   },
 
-  // Archivos y Carga (Módulo 7)
+  // Archivos
   FILE_REQUIRED: {
     status: 400,
     code: "ERR_FILE_REQUIRED",
@@ -77,12 +82,12 @@ const ERROR_CODES = Object.freeze({
   INVALID_FILE_TYPE: {
     status: 400,
     code: "ERR_INVALID_FILE_TYPE",
-    message: "Tipo de archivo no permitido. Solo se aceptan PDF, JPG o PNG",
+    message: "Tipo de archivo no permitido",
   },
   FILE_TOO_LARGE: {
     status: 400,
     code: "ERR_FILE_TOO_LARGE",
-    message: "El archivo supera el límite de tamaño permitido (5MB)",
+    message: "El archivo supera el límite de tamaño permitido",
   },
   INVALID_DOCUMENT_TYPE: {
     status: 400,
