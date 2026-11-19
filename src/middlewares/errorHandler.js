@@ -3,25 +3,34 @@ const logger = require("../config/logger");
 const multer = require("multer");
 
 const errorHandler = (err, req, res, next) => {
-  // 1. Atrapar errores específicos de Multer (ej. tamaño excedido)
+  // 1. Errores de Multer
   if (err instanceof multer.MulterError) {
     if (err.code === "LIMIT_FILE_SIZE") {
       logger.warning(`Intento de subir archivo demasiado grande en ${req.url}`);
       return res.status(400).json({
         status: "error",
-        code: ERROR_CODES.FILE_TOO_LARGE.code, // <-- Agregamos el código
+        code: ERROR_CODES.FILE_TOO_LARGE.code,
         message: ERROR_CODES.FILE_TOO_LARGE.message,
       });
     }
-    // Otros errores de Multer
+    return res
+      .status(400)
+      .json({ status: "error", code: "ERR_MULTER", message: err.message });
+  }
+
+  // 2. CastError de Mongoose (ID inválido, ej: GET /users/123)
+  if (err.name === "CastError" && err.kind === "ObjectId") {
+    logger.warning(
+      `ID inválido proporcionado en ${req.method} ${req.url}: ${err.value}`,
+    );
     return res.status(400).json({
       status: "error",
-      code: "ERR_MULTER", // <-- Agregamos un código genérico
-      message: err.message,
+      code: ERROR_CODES.INVALID_ID.code,
+      message: ERROR_CODES.INVALID_ID.message,
     });
   }
 
-  // 2. Errores operativos controlados (AppError)
+  // 3. Errores operativos controlados (AppError)
   if (err.isOperational) {
     if (err.statusCode >= 400 && err.statusCode < 500) {
       logger.warning(
@@ -35,19 +44,18 @@ const errorHandler = (err, req, res, next) => {
 
     return res.status(err.statusCode).json({
       status: "error",
-      code: err.code || "ERR_OPERATIONAL",
+      code: err.code,
       message: err.message,
     });
   }
 
-  // 3. Errores inesperados (bugs, fallos de sintaxis, caída de DB)
+  // 4. Errores inesperados
   logger.error(
     `Error inesperado del servidor [${req.method} ${req.url}]: ${err.message}`,
   );
-
   return res.status(500).json({
     status: "error",
-    code: ERROR_CODES.INTERNAL_ERROR.code, // <-- Agregamos el código
+    code: ERROR_CODES.INTERNAL_ERROR.code,
     message: ERROR_CODES.INTERNAL_ERROR.message,
   });
 };
