@@ -12,6 +12,7 @@ const AppError = require("../utils/AppError");
 const logger = require("../config/logger");
 
 class MockService {
+  // Validación estricta de qty (debe ser entero > 0)
   validateQuantity(qty) {
     if (isNaN(qty) || !Number.isInteger(qty) || qty <= 0) {
       logger.warning(

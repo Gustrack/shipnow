@@ -55,9 +55,128 @@ npm start
 
 El servidor estará escuchando en http://localhost:3000.
 
+## Módulo 2: Mocking y Carga de Datos
+
+Esta versión incorpora un sistema para generar datos de prueba utilizando `@faker-js/faker`, respetando las relaciones y constantes del dominio.
+
+### Endpoints disponibles (sin guardar en DB)
+
+- **`GET /api/mocks/users?qty=5`**: Devuelve un array de usuarios simulados (mezcla roles `USER` y `COURIER`).
+- **`GET /api/mocks/couriers?qty=5`**: Devuelve únicamente usuarios con rol `COURIER`.
+- **`GET /api/mocks/products?qty=5`**: Devuelve productos simulados respetando la coherencia entre `stock` y `status` (si el stock es 0, el estado es `OUT_OF_STOCK`).
+
+### Endpoint de carga en DB
+
+- **`POST /api/mocks/seed?qty=10`**: Genera usuarios, productos, pedidos y entregas, y los inserta en MongoDB respetando las relaciones (pedido ↔ usuario, entrega ↔ pedido).
+
+### Ejemplos de uso
+
+**Obtener 3 usuarios simulados:**
+
+```bash
+curl http://localhost:3000/api/mocks/users?qty=3
+```
+
+Respuesta:
+
+```json
+{
+  "data": [
+    { "name": "Ana Pérez", "email": "ana@test.com", "role": "USER" },
+    { "name": "Luis Gómez", "email": "luis@test.com", "role": "COURIER" },
+    { "name": "Carlos Ruiz", "email": "carlos@test.com", "role": "USER" }
+  ]
+}
+```
+
+### Insertar datos de prueba en la DB:
+
+```bash
+curl -X POST http://localhost:3000/api/mocks/seed?qty=10
+```
+
+Respuesta:
+
+```json
+{
+  "message": "Datos insertados",
+  "insertados": { "users": 10, "products": 10, "orders": 10, "deliveries": 10 }
+}
+```
+
+### Verificación en MongoDB:
+
+Luego de ejecutar el seed, podés abrir MongoDB Compass y revisar las colecciones `users`, `products`, `orders` y `deliveries` para confirmar que los registros se insertaron con los ObjectIds relacionados correctamente.
+
+_Vista de la colección `users` (usuarios y repartidores generados):_
+![Mocks Users en MongoDB](./src/docs/images/mongo-users.png)
+
+_Vista de la colección `products` (relación con el usuario):_
+![Mocks Orders en MongoDB](./src/docs/images/mongo-products.png)
+
+_Vista de la colección `orders` (relación con el usuario):_
+![Mocks Orders en MongoDB](./src/docs/images/mongo-orders.png)
+
+_Vista de la colección `deliveries` (relación con el pedido y el repartidor):_
+![Mocks Deliveries en MongoDB](./src/docs/images/mongo-deliveries.png)
+
+## Módulo 3: Manejo Profesional de Errores
+
+La API cuenta con una capa centralizada de manejo de errores. Los servicios lanzan instancias de `AppError` utilizando un diccionario predefinido (`src/constants/errors.constants.js`). Un middleware global intercepta estos errores y formatea la respuesta final al cliente.
+
+### Estructura de error uniforme
+
+Todos los errores devuelven el mismo formato JSON:
+
+```json
+{
+  "status": "error",
+  "code": "ERR_EJEMPLO",
+  "message": "Descripción clara del error"
+}
+```
+
+### Casos de prueba (Módulo de Mocks)
+
+- Cantidad inválida (negativa):
+
+```bash
+curl "http://localhost:3000/api/mocks/users?qty=-5"
+```
+
+Respuesta: `400 Bad Request` con mensaje "La cantidad debe ser un número entero positivo mayor a 0".
+
+- Cantidad no numérica:
+
+```bash
+curl "http://localhost:3000/api/mocks/users?qty=abc"
+```
+
+Respuesta: `400 Bad Request` con el mismo mensaje.
+
+### Casos de prueba (Manejo de ID inválido)
+
+- ID de Mongoose inválido:
+
+```bash
+curl "http://localhost:3000/api/products/123"
+```
+
+Respuesta: `400 Bad Request` con mensaje "El ID proporcionado no es válido" (código `ERR_INVALID_ID`).
+
+### Casos de prueba (Recurso no encontrado)
+
+- Producto inexistente:
+
+```bash
+curl "http://localhost:3000/api/products/000000000000000000000000"
+```
+
+Respuesta: `404 Not Found` con mensaje "Producto no encontrado".
+
 # Documentación de la API (Swagger)
 
-![Vista previa de Swagger UI](./src/docs/swagger-preview.png)
+![Vista previa de Swagger UI](./src/docs/images/swagger-preview.png)
 
 La API cuenta con documentación interactiva donde podés consultar y probar todos los endpoints en vivo.
 
@@ -185,10 +304,11 @@ Este repositorio utiliza Git Tags para marcar la evolución del proyecto. Podés
 
 shipnow/  
 ├── src/  
-│ ├── config/ # Configuración de entorno,logger y Multer  
-│ ├── constants/ # Diccionarios de roles, estados y errores
+│ ├── config/ # Configuración de entorno, logger y Multer  
+│ ├── constants/ # Diccionarios de roles, estados y errores  
 │ ├── controllers/ # Puerta de entrada HTTP (req/res)  
-│ ├── docs/ # Configuración de Swagger  
+│ ├── docs/ # Configuración de Swagger e imágenes  
+│ │ └── images/ # Capturas para el README  
 │ ├── middlewares/ # Manejo global de errores y logs HTTP  
 │ ├── models/ # Esquemas de Mongoose  
 │ ├── repositories/ # Acceso a datos (MongoDB)  
