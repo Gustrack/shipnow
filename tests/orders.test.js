@@ -42,14 +42,15 @@ describe("Orders API", () => {
       testOrderId = res.body.data._id;
     });
 
-    it("Debería fallar si faltan datos requeridos (items)", async () => {
+    it("Debería fallar si faltan datos requeridos (items) con código de error", async () => {
       const res = await request(app)
         .post("/api/orders")
         .send({ user: testUserId, total: 100 });
 
       expect(res.status).to.equal(400);
       expect(res.body.status).to.equal("error");
-      expect(res.body).to.have.property("code"); // Validamos que incluya el código de error
+      // Validamos el código exacto de validación definido en el diccionario
+      expect(res.body.code).to.equal("ERR_VALIDATION");
     });
   });
 
@@ -68,11 +69,12 @@ describe("Orders API", () => {
       expect(res.body.data._id).to.equal(testOrderId);
     });
 
-    it("Debería devolver 404 si el pedido no existe", async () => {
+    it("Debería devolver 404 si el pedido no existe (con code)", async () => {
       const res = await request(app).get(
         "/api/orders/000000000000000000000000",
       );
       expect(res.status).to.equal(404);
+      expect(res.body.code).to.equal("ERR_ORDER_NOT_FOUND");
       expect(res.body.message).to.include("Pedido no encontrado");
     });
   });
@@ -87,13 +89,14 @@ describe("Orders API", () => {
       expect(res.body.data.status).to.equal(ORDER_STATUS.IN_PROGRESS);
     });
 
-    it("Debería fallar al intentar poner un estado inválido", async () => {
+    it("Debería fallar al intentar poner un estado inválido (con code)", async () => {
       const res = await request(app)
         .patch(`/api/orders/${testOrderId}/status`)
         .send({ status: "ESTADO_FALSO" });
 
       expect(res.status).to.equal(400);
-      expect(res.body.message).to.include("Estado de pedido inválido");
+      expect(res.body.code).to.equal("ERR_INVALID_ORDER_STATUS");
+      expect(res.body.message).to.include("El estado del pedido no es válido"); // Corregido
     });
   });
 });

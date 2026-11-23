@@ -7,18 +7,19 @@ class OrderService {
   async getAll() {
     return orderRepository.findAll();
   }
+
   async getById(id) {
     const order = await orderRepository.findById(id);
-    if (!order)
-      throw new AppError({ status: 404, message: "Pedido no encontrado" });
+    if (!order) {
+      throw new AppError(ERROR_CODES.ORDER_NOT_FOUND); // <-- Usa el diccionario
+    }
     return order;
   }
+
   async create({ user, items, total }) {
     if (!user || !items || items.length === 0) {
-      throw new AppError({
-        status: 400,
-        message: "Datos del pedido inválidos",
-      });
+      // Usamos el error de validación genérico o creamos uno específico
+      throw new AppError(ERROR_CODES.VALIDATION_ERROR);
     }
     return orderRepository.create({
       user,
@@ -27,13 +28,15 @@ class OrderService {
       status: ORDER_STATUS.CREATED,
     });
   }
+
   async updateStatus(id, status) {
     if (!Object.values(ORDER_STATUS).includes(status)) {
-      throw new AppError({ status: 400, message: "Estado de pedido inválido" });
+      throw new AppError(ERROR_CODES.INVALID_ORDER_STATUS); // <-- Usa el diccionario
     }
     const updated = await orderRepository.updateStatus(id, status);
-    if (!updated)
-      throw new AppError({ status: 404, message: "Pedido no encontrado" });
+    if (!updated) {
+      throw new AppError(ERROR_CODES.ORDER_NOT_FOUND); // <-- Usa el diccionario
+    }
     return updated;
   }
 }

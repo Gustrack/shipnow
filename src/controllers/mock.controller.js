@@ -31,16 +31,6 @@ class MockController {
     }
   }
 
-  async seedData(req, res, next) {
-    try {
-      const qty = req.query.qty ? parseInt(req.query.qty) : 10;
-      const result = await mockService.seedDatabase(qty);
-      res.status(201).json({ message: "Datos insertados", insertados: result });
-    } catch (error) {
-      next(error);
-    }
-  }
-
   getMockOrders(req, res, next) {
     try {
       const qty = req.query.qty ? parseInt(req.query.qty) : 10;
@@ -56,6 +46,16 @@ class MockController {
       const qty = req.query.qty ? parseInt(req.query.qty) : 10;
       const deliveries = mockService.generateMockDeliveries(qty);
       res.status(200).json({ data: deliveries });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async seedData(req, res, next) {
+    try {
+      const qty = req.query.qty ? parseInt(req.query.qty) : 10;
+      const result = await mockService.seedDatabase(qty);
+      res.status(201).json({ message: "Datos insertados", insertados: result });
     } catch (error) {
       next(error);
     }

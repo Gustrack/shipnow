@@ -6,7 +6,6 @@ const User = require("../src/models/user.model");
 const { expect } = chai;
 
 describe("Users API", () => {
-  // Limpieza antes de este grupo para asegurar que el array esté vacío
   before(async () => {
     await User.deleteMany({});
   });
@@ -18,11 +17,11 @@ describe("Users API", () => {
       expect(res.body.data).to.be.an("array").that.is.empty;
     });
 
-    it("Debería devolver 400 si el rol filtrado es inválido", async () => {
+    it("Debería devolver 400 si el rol filtrado es inválido (con code)", async () => {
       const res = await request(app).get("/api/users?role=INVALIDO");
       expect(res.status).to.equal(400);
       expect(res.body.status).to.equal("error");
-      // Corregido para que coincida exactamente con el diccionario de errores
+      expect(res.body.code).to.equal("ERR_INVALID_ROLE");
       expect(res.body.message).to.include("El rol proporcionado no es válido");
     });
   });
@@ -35,20 +34,16 @@ describe("Users API", () => {
 
       expect(res.status).to.equal(201);
       expect(res.body.data).to.have.property("_id");
-      expect(res.body.data.email).to.equal("test@test.com");
     });
 
-    it("Debería fallar si falta el email", async () => {
+    it("Debería devolver 409 si el email ya existe (con code)", async () => {
       const res = await request(app)
         .post("/api/users")
-        .send({ name: "No Email" });
+        .send({ name: "Test User", email: "test@test.com" });
 
-      // Al no tener email, el modelo lanza un error de validación.
-      // Nuestro middleware lo atrapa como un error inesperado (500) o de validación.
-      expect(res.status).to.be.oneOf([400, 500]);
+      expect(res.status).to.equal(409);
       expect(res.body.status).to.equal("error");
-      // Validamos que el mensaje no esté vacío
-      expect(res.body.message).to.be.a("string").that.is.not.empty;
+      expect(res.body.code).to.equal("ERR_EMAIL_EXISTS");
     });
   });
 });

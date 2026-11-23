@@ -26,7 +26,6 @@ class MockService {
     this.validateQuantity(qty);
     const users = [];
     for (let i = 0; i < qty; i++) {
-      // Si se pide un rol específico, lo usamos. Si no, alternamos.
       const isCourier =
         role === USER_ROLES.COURIER || (role === null && i % 3 === 0);
       users.push({
@@ -51,7 +50,6 @@ class MockService {
         name: faker.commerce.productName(),
         price: parseFloat(faker.commerce.price({ min: 10, max: 500 })),
         stock: stock,
-        // Coherencia: Si el stock es 0, el estado debe ser OUT_OF_STOCK
         status:
           stock === 0 ? PRODUCT_STATUS.OUT_OF_STOCK : PRODUCT_STATUS.AVAILABLE,
       });
@@ -94,14 +92,12 @@ class MockService {
     return deliveries;
   }
 
-  // Genera órdenes y entregas en memoria usando datos ya existentes
   generateMockOrdersAndDeliveries(users, products, qty) {
     this.validateQuantity(qty);
     const orders = [];
     const deliveries = [];
 
     for (let i = 0; i < qty; i++) {
-      // Usamos arrayElement para aleatoriedad real
       const randomUser = faker.helpers.arrayElement(
         users.filter((u) => u.role === USER_ROLES.USER),
       );
@@ -127,7 +123,7 @@ class MockService {
           priority: faker.helpers.arrayElement(
             Object.values(DELIVERY_PRIORITY),
           ),
-          status: DELIVERY_STATUS.PENDING, // Usamos la constante
+          status: DELIVERY_STATUS.PENDING,
         });
       }
     }
