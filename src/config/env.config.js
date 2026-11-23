@@ -1,33 +1,48 @@
-require('dotenv').config();
+const path = require("path");
 
-const REQUIRED_ENV = ['PORT', 'MONGODB_URI', 'NODE_ENV'];
+// Forzamos la carga del archivo de test si estamos en modo test
+if (process.env.NODE_ENV === "test") {
+  require("dotenv").config({
+    path: path.resolve(__dirname, "../../.env.test"),
+  });
+} else {
+  require("dotenv").config(); // Carga el .env por defecto
+}
+
+const REQUIRED_ENV = ["PORT", "MONGODB_URI", "NODE_ENV"];
 
 function loadConfig() {
-    const missing = REQUIRED_ENV.filter((key) => !process.env[key] || process.env[key].trim() === '');
+  const missing = REQUIRED_ENV.filter(
+    (key) => !process.env[key] || process.env[key].trim() === "",
+  );
 
-    if (missing.length > 0) {
-        throw new Error(
-            `[Config] Faltan variables de entorno requeridas: ${missing.join(', ')}. ` +
-            `Revisá tu archivo .env (podés basarte en .env.example).`
-        );
-    }
+  if (missing.length > 0) {
+    throw new Error(
+      `[Config] Faltan variables de entorno requeridas: ${missing.join(", ")}. ` +
+        `Revisá tu archivo .env (podés basarte en .env.example).`,
+    );
+  }
 
-    const port = Number(process.env.PORT);
-    if (!Number.isInteger(port) || port <= 0) {
-        throw new Error(`[Config] PORT debe ser un número entero positivo. Recibido: '${process.env.PORT}'.`);
-    }
+  const port = Number(process.env.PORT);
+  if (!Number.isInteger(port) || port <= 0) {
+    throw new Error(
+      `[Config] PORT debe ser un número entero positivo. Recibido: '${process.env.PORT}'.`,
+    );
+  }
 
-    const validEnvs = ['development', 'production', 'test'];
-    if (!validEnvs.includes(process.env.NODE_ENV)) {
-        throw new Error(`[Config] NODE_ENV debe ser uno de: ${validEnvs.join(', ')}.`);
-    }
+  const validEnvs = ["development", "production", "test"];
+  if (!validEnvs.includes(process.env.NODE_ENV)) {
+    throw new Error(
+      `[Config] NODE_ENV debe ser uno de: ${validEnvs.join(", ")}.`,
+    );
+  }
 
-    return Object.freeze({
-        port,
-        mongoUri: process.env.MONGODB_URI,
-        nodeEnv: process.env.NODE_ENV,
-        isProduction: process.env.NODE_ENV === 'production'
-    });
+  return Object.freeze({
+    port,
+    mongoUri: process.env.MONGODB_URI,
+    nodeEnv: process.env.NODE_ENV,
+    isProduction: process.env.NODE_ENV === "production",
+  });
 }
 
 const config = loadConfig();

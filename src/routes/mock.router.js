@@ -6,31 +6,61 @@ const router = express.Router();
  * @openapi
  * /mocks/users:
  *   get:
- *     summary: Generar usuarios simulados (sin guardar en DB)
+ *     summary: Generar usuarios simulados
  *     tags: [Mocks]
- *     parameters:
- *       - in: query
- *         name: qty
- *         schema:
- *           type: integer
- *         description: Cantidad de usuarios a generar (por defecto 10)
  *     responses:
  *       200:
- *         description: Lista de usuarios generados
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
- *       400:
- *         description: Cantidad inválida (negativa o no numérica)
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         description: Lista de usuarios
  */
 router.get("/users", mockController.getMockUsers);
+
+/**
+ * @openapi
+ * /mocks/couriers:
+ *   get:
+ *     summary: Generar repartidores simulados
+ *     tags: [Mocks]
+ *     responses:
+ *       200:
+ *         description: Lista de repartidores
+ */
+router.get("/couriers", mockController.getMockCouriers);
+
+/**
+ * @openapi
+ * /mocks/products:
+ *   get:
+ *     summary: Generar productos simulados
+ *     tags: [Mocks]
+ *     responses:
+ *       200:
+ *         description: Lista de productos
+ */
+router.get("/products", mockController.getMockProducts);
+
+/**
+ * @openapi
+ * /mocks/orders:
+ *   get:
+ *     summary: Generar pedidos simulados
+ *     tags: [Mocks]
+ *     responses:
+ *       200:
+ *         description: Lista de pedidos
+ */
+router.get("/orders", mockController.getMockOrders);
+
+/**
+ * @openapi
+ * /mocks/deliveries:
+ *   get:
+ *     summary: Generar entregas simuladas
+ *     tags: [Mocks]
+ *     responses:
+ *       200:
+ *         description: Lista de entregas
+ */
+router.get("/deliveries", mockController.getMockDeliveries);
 
 /**
  * @openapi
@@ -38,27 +68,9 @@ router.get("/users", mockController.getMockUsers);
  *   post:
  *     summary: Insertar datos de prueba en la base de datos
  *     tags: [Mocks]
- *     parameters:
- *       - in: query
- *         name: qty
- *         schema:
- *           type: integer
- *         description: Cantidad de registros a insertar (por defecto 10)
  *     responses:
  *       201:
- *         description: Datos insertados correctamente
- *       400:
- *         description: Cantidad inválida
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       500:
- *         description: Error al insertar en la base de datos
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *         description: Datos insertados
  */
 router.post("/seed", mockController.seedData);
 

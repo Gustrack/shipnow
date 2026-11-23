@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "cross-env NODE_ENV=test mocha --require tests/setup.js 'tests/**/*.test.js' --exit"
+    "test": "cross-env DOTENV_CONFIG_PATH=.env.test NODE_ENV=test mocha --require tests/setup.js 'tests/**/*.test.js' --exit"
   },
   "keywords": [
     "shipnow",

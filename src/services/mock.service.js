@@ -4,6 +4,7 @@ const {
   USER_ROLES,
   ORDER_STATUS,
   DELIVERY_PRIORITY,
+  DELIVERY_STATUS,
   PRODUCT_STATUS,
 } = require("../constants");
 const { ERROR_CODES } = require("../constants/errors.constants");
@@ -12,7 +13,7 @@ const logger = require("../config/logger");
 
 class MockService {
   validateQuantity(qty) {
-    if (isNaN(qty) || qty <= 0) {
+    if (isNaN(qty) || !Number.isInteger(qty) || qty <= 0) {
       logger.warning(
         `Intento de generar mocks con cantidad inválida: '${qty}'`,
       );
@@ -20,14 +21,12 @@ class MockService {
     }
   }
 
-  generateMockUsers(qty = 10) {
+  generateMockUsers(qty = 10, role = null) {
     this.validateQuantity(qty);
-    logger.debug(`Generando ${qty} usuarios mock en memoria`);
-
     const users = [];
     for (let i = 0; i < qty; i++) {
-      // 1 de cada 3 es repartidor
-      const isCourier = i % 3 === 0;
+      const isCourier =
+        role === USER_ROLES.COURIER || (role === null && i % 3 === 0);
       users.push({
         name: faker.person.fullName(),
         email: faker.internet.email().toLowerCase(),
@@ -37,31 +36,72 @@ class MockService {
     return users;
   }
 
+  generateMockCouriers(qty = 10) {
+    return this.generateMockUsers(qty, USER_ROLES.COURIER);
+  }
+
   generateMockProducts(qty = 10) {
     this.validateQuantity(qty);
     const products = [];
     for (let i = 0; i < qty; i++) {
+      const stock = faker.number.int({ min: 0, max: 50 });
       products.push({
         name: faker.commerce.productName(),
         price: parseFloat(faker.commerce.price({ min: 10, max: 500 })),
-        stock: faker.number.int({ min: 0, max: 50 }),
-        status: PRODUCT_STATUS.AVAILABLE,
+        stock: stock,
+        status:
+          stock === 0 ? PRODUCT_STATUS.OUT_OF_STOCK : PRODUCT_STATUS.AVAILABLE,
       });
     }
     return products;
   }
 
+  generateMockOrders(qty = 10) {
+    this.validateQuantity(qty);
+    const orders = [];
+    for (let i = 0; i < qty; i++) {
+      orders.push({
+        _id: faker.database.mongodbObjectId(),
+        user: faker.database.mongodbObjectId(),
+        items: [
+          {
+            product: faker.database.mongodbObjectId(),
+            quantity: faker.number.int({ min: 1, max: 3 }),
+          },
+        ],
+        total: parseFloat(faker.commerce.price({ min: 50, max: 1000 })),
+        status: faker.helpers.arrayElement(Object.values(ORDER_STATUS)),
+      });
+    }
+    return orders;
+  }
+
+  generateMockDeliveries(qty = 10) {
+    this.validateQuantity(qty);
+    const deliveries = [];
+    for (let i = 0; i < qty; i++) {
+      deliveries.push({
+        _id: faker.database.mongodbObjectId(),
+        order: faker.database.mongodbObjectId(),
+        courier: faker.database.mongodbObjectId(),
+        priority: faker.helpers.arrayElement(Object.values(DELIVERY_PRIORITY)),
+        status: DELIVERY_STATUS.PENDING,
+      });
+    }
+    return deliveries;
+  }
+
   generateMockOrdersAndDeliveries(users, products, qty) {
+    this.validateQuantity(qty);
     const orders = [];
     const deliveries = [];
 
     for (let i = 0; i < qty; i++) {
-      const randomUser =
-        users.find((u) => u.role === USER_ROLES.USER) || users[0];
+      const randomUser = faker.helpers.arrayElement(
+        users.filter((u) => u.role === USER_ROLES.USER),
+      );
       const randomProduct = faker.helpers.arrayElement(products);
       const quantity = faker.number.int({ min: 1, max: 3 });
-
-      // Simulamos el ID para poder relacionarlo con la entrega antes de guardar en Mongo
       const orderId = faker.database.mongodbObjectId();
 
       orders.push({
@@ -72,7 +112,9 @@ class MockService {
         status: faker.helpers.arrayElement(Object.values(ORDER_STATUS)),
       });
 
-      const randomCourier = users.find((u) => u.role === USER_ROLES.COURIER);
+      const randomCourier = faker.helpers.arrayElement(
+        users.filter((u) => u.role === USER_ROLES.COURIER),
+      );
       if (randomCourier) {
         deliveries.push({
           order: orderId,
@@ -80,11 +122,10 @@ class MockService {
           priority: faker.helpers.arrayElement(
             Object.values(DELIVERY_PRIORITY),
           ),
-          status: "PENDING",
+          status: DELIVERY_STATUS.PENDING,
         });
       }
     }
-
     return { orders, deliveries };
   }
 
@@ -92,16 +133,12 @@ class MockService {
     this.validateQuantity(qty);
     try {
       logger.info(`Iniciando carga de datos de prueba en DB (qty=${qty})`);
-
-      // 1. Generar y guardar usuarios
       const mockUsers = this.generateMockUsers(qty);
       const savedUsers = await mockRepository.insertUsers(mockUsers);
 
-      // 2. Generar y guardar productos
       const mockProducts = this.generateMockProducts(qty);
       const savedProducts = await mockRepository.insertProducts(mockProducts);
 
-      // 3. Generar pedidos y entregas (usando los IDs reales recién guardados)
       const { orders, deliveries } = this.generateMockOrdersAndDeliveries(
         savedUsers,
         savedProducts,

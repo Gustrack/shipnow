@@ -96,9 +96,13 @@ El proyecto cuenta con una suite de tests funcionales automatizados para garanti
 npm test
 ```
 
-## Entorno de Testing
+### Entorno de Testing
 
-Los tests se ejecutan con NODE_ENV=test. Las variables de entorno específicas están en el archivo .env.test (el cual apunta a una base de datos separada llamada shipnow_test, manteniendo intactos tus datos de desarrollo).
+Los tests se ejecutan con `NODE_ENV=test`. Las variables de entorno específicas están en el archivo `.env.test`:
+
+- `PORT=3001` (Puerto separado para evitar conflictos con el servidor de desarrollo).
+- `MONGODB_URI=mongodb://localhost:27017/shipnow_test` (Base de datos separada).
+- `NODE_ENV=test`.
 
 ### Módulos cubiertos por los tests
 

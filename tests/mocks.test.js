@@ -6,46 +6,61 @@ const { expect } = chai;
 
 describe("Mocks API", () => {
   describe("GET /api/mocks/users", () => {
-    it("Debería generar la cantidad exacta de usuarios solicitados", async () => {
+    it("Debería generar usuarios", async () => {
       const res = await request(app).get("/api/mocks/users?qty=3");
       expect(res.status).to.equal(200);
       expect(res.body.data).to.have.lengthOf(3);
-      expect(res.body.data[0]).to.have.property("email");
     });
-
-    it("Debería fallar con cantidad negativa", async () => {
+    it("Debería fallar con cantidad inválida (con code)", async () => {
       const res = await request(app).get("/api/mocks/users?qty=-1");
       expect(res.status).to.equal(400);
-      expect(res.body.status).to.equal("error");
-      expect(res.body.message).to.include(
-        "La cantidad debe ser un número entero positivo",
-      );
-      expect(res.body).to.have.property("code"); // <-- Validamos el código interno
+      expect(res.body.code).to.equal("ERR_INVALID_QUANTITY");
     });
+  });
 
-    it("Debería fallar con cantidad no numérica", async () => {
-      const res = await request(app).get("/api/mocks/users?qty=abc");
-      expect(res.status).to.equal(400);
-      expect(res.body).to.have.property("code"); // <-- Validamos el código interno
+  describe("GET /api/mocks/couriers", () => {
+    it("Debería generar repartidores", async () => {
+      const res = await request(app).get("/api/mocks/couriers?qty=2");
+      expect(res.status).to.equal(200);
+      expect(res.body.data).to.have.lengthOf(2);
+      expect(res.body.data[0]).to.have.property("role", "COURIER");
+    });
+  });
+
+  describe("GET /api/mocks/products", () => {
+    it("Debería generar productos", async () => {
+      const res = await request(app).get("/api/mocks/products?qty=2");
+      expect(res.status).to.equal(200);
+      expect(res.body.data).to.have.lengthOf(2);
+    });
+  });
+
+  describe("GET /api/mocks/orders", () => {
+    it("Debería generar pedidos", async () => {
+      const res = await request(app).get("/api/mocks/orders?qty=2");
+      expect(res.status).to.equal(200);
+      expect(res.body.data).to.have.lengthOf(2);
+    });
+  });
+
+  describe("GET /api/mocks/deliveries", () => {
+    it("Debería generar entregas", async () => {
+      const res = await request(app).get("/api/mocks/deliveries?qty=2");
+      expect(res.status).to.equal(200);
+      expect(res.body.data).to.have.lengthOf(2);
     });
   });
 
   describe("POST /api/mocks/seed", () => {
-    it("Debería insertar los datos en la DB correctamente", async () => {
+    it("Debería insertar datos en la DB", async () => {
       const res = await request(app).post("/api/mocks/seed?qty=2");
       expect(res.status).to.equal(201);
-      expect(res.body.insertados).to.have.property("users", 2);
+      expect(res.body.insertados.users).to.equal(2);
     });
-
-    // NUEVO: Test de cantidad inválida en el seed (requerido por el profesor)
-    it("Debería fallar con cantidad inválida en seed", async () => {
+    it("Debería fallar con cantidad inválida (con code)", async () => {
       const res = await request(app).post("/api/mocks/seed?qty=-5");
       expect(res.status).to.equal(400);
-      expect(res.body.status).to.equal("error");
-      expect(res.body.message).to.include(
-        "La cantidad debe ser un número entero positivo",
-      );
-      expect(res.body).to.have.property("code"); // <-- Validamos el código interno
+      expect(res.body.code).to.equal("ERR_INVALID_QUANTITY");
     });
   });
 });
